@@ -1,5 +1,6 @@
 <?php
 // Forward requests to actual user page at IITD internal-web.
+require __DIR__."/vendor/autoload.php";
 
 function get_path_prefix() {
 	$script_name = basename(__FILE__, ".php");
@@ -33,11 +34,23 @@ function get_request_path() {
 	];
 }
 
-function main() {
-	$request_path = get_request_path();
-	echo json_encode($request_path);
+function get_upstream_response($userId, $userPath) {
+	$url = "http://privateweb.iitd.ac.in/~".$userId.$userPath;
+	$method = $_SERVER["REQUEST_METHOD"];
+
+	$client = new GuzzleHttp\Client();
+	return $client->request($method, $url);
 }
 
-header('Content-type:application/json;charset=utf-8');
+function main() {
+	$request_path = get_request_path();
+	$userId = $request_path["userId"];
+	$userPath = $request_path["userPath"];
+	
+	$response = get_upstream_response($userId, $userPath);
+	echo $response->getBody();
+}
+
+// header('Content-type:application/json;charset=utf-8');
 main();
 ?>
