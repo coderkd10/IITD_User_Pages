@@ -37,9 +37,19 @@ function get_request_path() {
 function get_upstream_response($userId, $userPath) {
 	$url = "http://privateweb.iitd.ac.in/~".$userId.$userPath;
 	$method = $_SERVER["REQUEST_METHOD"];
+	$request_headers = getallheaders();
 
 	$client = new GuzzleHttp\Client();
-	return $client->request($method, $url);
+	return $client->request($method, $url, [
+		"headers" => $request_headers,
+		"body" => fopen("php://input", "r")
+	]);
+}
+
+function set_headers($headers) {
+	foreach ($headers as $name => $values) {
+		header($name . ': ' . implode(', ', $values));
+	}
 }
 
 function main() {
@@ -48,6 +58,7 @@ function main() {
 	$userPath = $request_path["userPath"];
 	
 	$response = get_upstream_response($userId, $userPath);
+	set_headers($response->getHeaders());
 	echo $response->getBody();
 }
 
