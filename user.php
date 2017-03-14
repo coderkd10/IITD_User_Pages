@@ -1,5 +1,13 @@
 <?php
-// Forward requests to actual user page at IITD internal-web.
+/**
+* Simple proxy for enabling public user pages for all IITD EE students.
+* Forward requests to actual user page at IITD internal-web.
+*
+* See : http://www.cc.iitd.ernet.in/CSC/index.php?option=com_content&view=article&id=107&Itemid=146
+*
+* @author Abhishek Kedia (kedia.abhishek10 [at] gmail.com)
+*/
+
 require __DIR__."/vendor/autoload.php";
 
 function get_path_prefix() {
@@ -84,6 +92,5 @@ function main() {
 	echo $response->getBody();
 }
 
-// header('Content-type:application/json;charset=utf-8');
 main();
 ?>
