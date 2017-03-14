@@ -42,7 +42,8 @@ function get_upstream_response($userId, $userPath) {
 	$client = new GuzzleHttp\Client();
 	return $client->request($method, $url, [
 		"headers" => $request_headers,
-		"body" => fopen("php://input", "r")
+		"body" => fopen("php://input", "r"),
+		'http_errors' => false
 	]);
 }
 
@@ -58,6 +59,7 @@ function main() {
 	$userPath = $request_path["userPath"];
 	
 	$response = get_upstream_response($userId, $userPath);
+	http_response_code($response->getStatusCode());
 	set_headers($response->getHeaders());
 	echo $response->getBody();
 }
