@@ -34,10 +34,30 @@ function get_request_path() {
 	];
 }
 
+function get_client_ip() {
+    $ipaddress = '';
+    if (isset($_SERVER['HTTP_CLIENT_IP']))
+        $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+    else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+        $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    else if(isset($_SERVER['HTTP_X_FORWARDED']))
+        $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+    else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+        $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+    else if(isset($_SERVER['HTTP_FORWARDED']))
+        $ipaddress = $_SERVER['HTTP_FORWARDED'];
+    else if(isset($_SERVER['REMOTE_ADDR']))
+        $ipaddress = $_SERVER['REMOTE_ADDR'];
+    else
+        $ipaddress = 'UNKNOWN';
+    return $ipaddress;
+}
+
 function get_upstream_response($userId, $userPath) {
 	$url = "http://privateweb.iitd.ac.in/~".$userId.$userPath;
 	$method = $_SERVER["REQUEST_METHOD"];
 	$request_headers = getallheaders();
+	$request_headers["X-Forwarded-For"] = get_client_ip(); //Send client IP upstream
 
 	$client = new GuzzleHttp\Client();
 	return $client->request($method, $url, [
