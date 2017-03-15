@@ -67,6 +67,7 @@ function get_upstream_response($userId, $userPath) {
 	$url = "http://privateweb.iitd.ac.in/~".$userId."/ees_home".$userPath;
 	$method = $_SERVER["REQUEST_METHOD"];
 	$request_headers = getallheaders();
+	unset($request_headers["Host"]);
 	$request_headers["Connection"] = "close"; //keep-alive connections take too long (~ 5s) to respond. Also see - https://github.com/guzzle/guzzle/issues/1348
 	$request_headers["X-Forwarded-For"] = get_client_ip(); //Send client IP upstream
 
@@ -74,6 +75,7 @@ function get_upstream_response($userId, $userPath) {
 					->uri($url)
 					->body(file_get_contents('php://input'))
 					->addHeaders($request_headers)
+					->followRedirects(true)
 					->send();
 	return $response;
 }
