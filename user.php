@@ -62,20 +62,23 @@ function get_client_ip() {
 }
 
 function get_upstream_response($userId, $userPath) {
-	$url = "http://privateweb.iitd.ac.in/~".$userId.$userPath;
+	$url = "http://privateweb.iitd.ac.in/~".$userId."/ees_home".$userPath;
 	$method = $_SERVER["REQUEST_METHOD"];
 	$request_headers = getallheaders();
+	$request_headers["Connection"] = "close"; //keep-alive connections take too long (~ 5s) to respond. Also see - https://github.com/guzzle/guzzle/issues/1348
 	$request_headers["X-Forwarded-For"] = get_client_ip(); //Send client IP upstream
 
 	$client = new GuzzleHttp\Client();
 	return $client->request($method, $url, [
 		"headers" => $request_headers,
 		"body" => fopen("php://input", "r"),
-		'http_errors' => false
+		"http_errors" => false,
+		"stream" => true
 	]);
 }
 
 function set_headers($headers) {
+	unset($headers["Connection"]); //use default value (supplied by incoming request) for connection header
 	foreach ($headers as $name => $values) {
 		header($name . ': ' . implode(', ', $values));
 	}
@@ -89,7 +92,13 @@ function main() {
 	$response = get_upstream_response($userId, $userPath);
 	http_response_code($response->getStatusCode());
 	set_headers($response->getHeaders());
-	echo $response->getBody();
+
+	// echo $response->getBody();
+	// Stream response instead
+	$bodyStream = $response->getBody();
+	while (!$bodyStream->eof()) {
+		echo $bodyStream->read(1024);
+	}
 }
 
 main();
