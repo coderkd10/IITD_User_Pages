@@ -8,7 +8,7 @@
 * @author Abhishek Kedia (kedia.abhishek10 [at] gmail.com)
 */
 
-require __DIR__."/vendor/autoload.php";
+require __DIR__.'/httpful.phar';
 
 function get_path_prefix() {
 	$script_name = basename(__FILE__, ".php");
@@ -17,7 +17,8 @@ function get_path_prefix() {
 
 	$is_matched = preg_match($prefix_regex, $script_path, $matches);
 	if (!$is_matched) {
-		http_response_code(500);
+		// http_response_code(500);
+		header("HTTP/1.0 500 Internal Server Error");
 		die("Cannot find path prefix");
 	}
 	return $matches[1];
@@ -31,15 +32,16 @@ function get_request_path() {
 	$uri = $_SERVER["REQUEST_URI"];
 	$is_matched = preg_match($PATH_REGEX, $uri, $matches);
 	if (!$is_matched) {
-		http_response_code(400);
+		// http_response_code(400);
+		header("HTTP/1.0 400 Bad Request");
 		die("Invalid URL format");
 	}
 
-	return [
+	return array(
 		"serverBase" => $matches[1],
 		"userId" => $matches[2],
 		"userPath" => $matches[3]
-	];
+	);
 }
 
 function get_client_ip() {
@@ -68,19 +70,26 @@ function get_upstream_response($userId, $userPath) {
 	$request_headers["Connection"] = "close"; //keep-alive connections take too long (~ 5s) to respond. Also see - https://github.com/guzzle/guzzle/issues/1348
 	$request_headers["X-Forwarded-For"] = get_client_ip(); //Send client IP upstream
 
-	$client = new GuzzleHttp\Client();
-	return $client->request($method, $url, [
-		"headers" => $request_headers,
-		"body" => fopen("php://input", "r"),
-		"http_errors" => false,
-		"stream" => true
-	]);
+	$response = \Httpful\Request::init($method)
+					->uri($url)
+					->body(file_get_contents('php://input'))
+					->addHeaders($request_headers)
+					->send();
+	return $response;
+}
+
+function set_reponse_code($response) {
+	$headers = $response->raw_headers;
+	$end = strpos($headers, "\r\n");
+	if ($end === false)
+		$end = strlen($headers);
+	header(substr($headers, 0, $end));
 }
 
 function set_headers($headers) {
-	unset($headers["Connection"]); //use default value (supplied by incoming request) for connection header
-	foreach ($headers as $name => $values) {
-		header($name . ': ' . implode(', ', $values));
+	unset($headers["connection"]); //use default value (supplied by incoming request) for connection header
+	foreach ($headers as $name => $value) {
+		header($name.": ".$value);
 	}
 }
 
@@ -90,15 +99,11 @@ function main() {
 	$userPath = $request_path["userPath"];
 	
 	$response = get_upstream_response($userId, $userPath);
-	http_response_code($response->getStatusCode());
-	set_headers($response->getHeaders());
+	// http_response_code($response->code);
+	set_reponse_code($response);
+	set_headers($response->headers->toArray());
 
-	// echo $response->getBody();
-	// Stream response instead
-	$bodyStream = $response->getBody();
-	while (!$bodyStream->eof()) {
-		echo $bodyStream->read(1024);
-	}
+	echo $response->raw_body;
 }
 
 main();
