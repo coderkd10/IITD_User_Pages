@@ -13,7 +13,7 @@ This script uses the existing `privateweb.iitd.ac.in` (internal) server that is 
 
 ### Department Server Admin
 
-To setup the facility, simply copy the zip from releases section and paste them on the web-server root (taking appropriate care of conflicts). User pages are then available as `http://ees.iitd.ac.in/user.php/<user-id>`.
+To setup the facility, simply copy the [archive](https://github.com/coderkd10/IITD_User_Pages/releases/download/v1.0.0/release.tar.gz) from releases section and paste them on the web-server root (taking appropriate care of conflicts). User pages are then available as `http://ees.iitd.ac.in/user.php/<user-id>`.
 
 ### Students
 
