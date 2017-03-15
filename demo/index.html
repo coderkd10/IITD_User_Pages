@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Demo - IITD User Web Pages</title>
+        <style type="text/css">
+            body {
+                margin: 40px auto;
+                max-width: 650px;
+                line-height: 1.6;
+                font-size: 18px;
+                color: #444;
+                padding: 0 10px
+            }
+
+            h1,h2,h3 {
+                line-height: 1.2
+            }
+
+            code {
+                font-family: monospace,monospace;
+                font-size: 1em;
+                padding: 2px 4px;
+                color: #c7254e;
+                background-color: #f9f2f4;
+                border-radius: 4px;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>
+                Demo - IITD User Pages
+            </h1>
+            <aside>For more see : <a href="https://github.com/coderkd10/IITD_User_Pages">Git Repo</a></aside>
+        </header>
+        
+        <h2>
+            <a id="What_2"></a>What?</h2>
+        <p>IIT Delhi has a public web-hosting facility for students. But sadly it is limited to PhD students only. (See <a href="http://www.cc.iitd.ernet.in/CSC/index.php?option=com_content&amp;view=article&amp;id=107&amp;Itemid=146">CSC website</a>)<br> Some departments (like CS) have their own system for allowing undergrads to host their public web-pages. But none exists currently for EE and other department students. So here is a simple script that can be used by other departments (like EE) to provide similar facility to their students.</p>
+        <h2>
+            <a id="How_it_works_7"></a>How it works?</h2>
+        <p>This script uses the existing <code>privateweb.iitd.ac.in</code> (internal) server that is accessible to all students. All requests are routed to the internal server, and responses are relayed back. It has the benefit that user pages need not be stored on the department (EES) web-server &amp; the (php) scripts are not run in the context of department web-server.</p>
+        <h2>
+            <a id="Usage_11"></a>Usage</h2>
+        <h3>
+            <a id="Department_Server_Admin_13"></a>Department Server Admin</h3>
+        <p>To setup the facility, simply copy the zip from releases section and paste them on the web-server root (taking appropriate care of conflicts). User pages are then available as <code>http://ees.iitd.ac.in/user.php/&lt;user-id&gt;</code>.</p>
+        <h3>
+            <a id="Students_17"></a>Students</h3>
+        <ul>
+            <li>Log on to your CSC accounts via <code>ssh1</code> or otherwise.</li>
+            <li><code>cd</code> into <code>private_html</code> directory in your home folder.</li>
+            <li>Create a new directory <code>ees_home</code> inside <code>private_html</code></li>
+            <li>Copy your web pages / php scripts to <code>ees_home</code> directory.</li>
+            <li>Make sure you have correct permissions set (check if your site is accessible at <code>http://privateweb.iitd.ac.in/~&lt;user-id&gt;/ees_home</code> from inside IITD).</li>
+        </ul>
+        <p>Now your site should now be accessible publicly!</p>
+    
+
+        <hr>
+        <h2>Epilogue</h2>
+        <p> 
+            Created by <a href="https://twitter.com/kediaabhishek10">Abhishek Kedia</a>.
+        </p>
+        <p>
+            Born out of frustration after mailing multiple CSC admin people &amp; failing to get any response from them.
+        </p>
+    </body>
+</html>
